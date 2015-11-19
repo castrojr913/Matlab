@@ -1,0 +1,28 @@
+%Delay Function
+%Vikas Sahdev
+%Rajesh Samudrala
+%Rajani Sadasivam
+%
+function f2 =  delay();
+
+[x,fs,nbits]=wavread('clackson.wav');%read in wav file 
+xlen=length(x);%Calc. the number of samples in the file 
+
+a=0.5; 
+R=35000;%Calculate the number of samples in the delay 
+y=zeros(size(x)); 
+
+% filter the signal 
+
+for i=1:1:R+1
+   y(i) = x(i);
+end
+
+for i=R+1:1:xlen 
+  y(i)= x(i)+ a*x(i-R); 
+end;
+
+
+wavwrite(y,fs,nbits,'delay.wav')
+[z,b]=wavread('delay.wav');
+sound(z,b)

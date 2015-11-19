@@ -1,0 +1,22 @@
+%METODO DE HALLEY
+%By: Jesús A. Castro R. Date: 07-12-08
+%
+%Es un algoritmo númerico que acelera la convergencia del método de Newton
+%Raphson aplicado a ecuaciones no lineales f(x)=0. Su orden
+%de convergencia es 3 (raices simples) y se puede demostrar que ésta
+%resulta al aplicar Newton-Raphson a una función: f(x)/sqrt(f'(x))
+%
+%Formula: xk+1=xk-(f(xk)/f'(xk))*(1-f(xk)*f''(xk)/(2*f'(xk)^2))^-1
+clear
+syms x
+disp('<< Metodo De Halley >>')
+f=input('Función f(x): ');
+xk=input('Aprox. inicial: ');
+iter=input('Iteraciones: ');
+tol=input('Tolerancia: ');
+disp('  k   xk   f(xk)   fx(xk)   fxx(xk)   xk+1   |xk+1-xk|')
+f1=diff(f);f2=diff(f1);
+for k=1:iter
+    f0=subs(f,xk);fx=subs(f1,xk);fxx=subs(f2,xk);
+    xk1=xk-(f0/fx)*(1-f0*fxx/(2*fx^2))^-1;
+    e=abs(xk1-xk)

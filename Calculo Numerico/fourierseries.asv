@@ -1,0 +1,328 @@
+%CÁLCULO DE LA SERIE DE FOURIER DE f(x) o f(t) EN [-L,L] Y DESARROLLOS DE 
+%MEDIO RANGO EN [0,L] CON SUS GRÁFICAS RESPECTIVAS.   
+%
+%NOTA_1: este programa calcula y gráfica cualquier tipo de serie de
+%Fourier de "funciones continuas" hasta aquéllas que posean una
+%indeterminación 0/0 (corrección por L'hopital). Ejemplo de este tipo de 
+%series: series con f(x) o f(t) sinusoidal. RECOMENDACIÓN: expresar
+%funciones hiperbólicas en sus equivalentes exponenciales.
+%
+%LIMITACIONES: causarán errores o bloqueos los siguientes:
+%(a)Más de una indeterminación 0/0 en la serie.** 
+%(b)Indeterminación 0/0 a valores de n>50.**
+%(c)Indeterminaciones k/0 en la serie <=> k~=0 (tienden al inf)***
+%(d)funciones como tangentes,secantes,cosecantes entre otros. Así mismo,
+%   funciones muy complicadas.
+%(e)funciones que son discontinuas al ser evaluadas en un intervalo.Ej: 
+%   f(t)= 1/(t-1), 0<t<2
+%
+%**:estos casos son muy poco probables. 
+%***:Es poco probablquizás si la funcion es discontinua.
+%
+%NOTA_2: Para el desarrollo en series de Fourier en [-L,L], el periodo
+%equivale a p=2L y en desarrollos de medio rango equivale a p=L.
+%
+%NOTA_3: para asignar leyendas a las gráficas, escribir en el command 
+%window: legend('l1','l2',...,-1). l1,l2,... equivale al nombre que se
+%desea dar a la gráfica1,2,... y -1 significa que la leyenda se ubique en 
+%la posición noroeste por fuera de la cuadricula. Por favor, al graficar 
+%escoja valores de n en un vector, ej: [1 2 3]. 
+%
+%NOTA_4: Las variables de la función son x o t. Tanto los intervalos  
+%como las funciones puede tomarse k y w como constantes.
+t_1='^';
+while t_1=='^'
+      close all
+      clear all;clc  
+      syms x n k w t
+      fnd_1=0;fnd_2=0;k2=0;k3=0;
+      hi=100;out=100; %constante de ingreso para las gráficas->hi=100
+      disp(' 		  SERIES DE FOURIER')
+      disp(' ')
+      var_1=input('Variable usada: ');
+      cantidad=input('Nº de ecuaciones de f(x) ó f(t): ');
+      disp('Escriba f(x) ó f(t):')
+      for c=1:cantidad
+          fun(c)=sym(input(' ->'));%convertir a simbolica
+      end
+      disp('Escriba los intervalos:')
+      for c=1:cantidad
+         for j=1:2
+            intervalo(c,j)=sym(input(' ->'));
+         end
+      end 
+%**** examina variables simbólicas k o w en la función o intervalo  ****
+      if isreal(fun)==0 %la funcion tiene variables simbolicas? 
+         fnd=findsym(fun); %encontrar variables símbólicas (orden ascendente)
+         c2=max(size(fnd));
+         for c=1:c2
+             if fnd(1,c)==k %¿está k? 
+                fnd_1=1;
+             elseif fnd(1,c)==w %¿está w?
+                fnd_2=1;
+             end   
+         end
+      end  
+      if isreal(intervalo)==0 
+         fnd=findsym(intervalo); 
+         c2=max(size(fnd));
+         for c=1:c2
+             if fnd(1,c)==k %¿está k? 
+                fnd_1=1;
+             elseif fnd(1,c)==w %¿está w?
+                fnd_2=1;
+             end   
+         end
+      end
+%*******************************************************************
+      long=(intervalo(cantidad,2)-intervalo(1,1))/2;
+      if intervalo(1,1)==0 %Si es un desarrollo de medio de rango
+         disp('1. Serie de senos')
+         disp('2. Serie de cosenos')
+         disp('3. Serie de Fourier')
+         disp('Elija 1 o 2 para desarrollo de medio rango');
+         disp('Elija 3 para desarrollo por serie de Fourier');
+         sw=input('Escoja una opción: ');
+         switch lower(sw)
+         case 1 %periodo => p=L ,0<x<L ;ojo: long = 1/2 del periodo p
+                %en este caso, L=2*long
+            disp('Serie de senos:')
+            for c=1:cantidad %calculando integrales 
+                integral(c)=int(fun(c).*sin((n*pi*var_1)/(2*long)),var_1,intervalo(c,1),intervalo(c,2));
+            end
+            bn=simple(sum(integral)/long);
+            dn=bn*sin(n*pi*var_1/(2*long));
+            resul_1=symsum(dn,n,1,inf);
+            code=1;disp(resul_1)
+         case 2 
+            disp('Serie de cosenos:')
+            for c=1:cantidad
+                integral2(c)=int(fun(c),var_1,intervalo(c,1),intervalo(c,2));
+                integral3(c)=int(fun(c).*cos((n*pi*var_1)/(2*long)),var_1,intervalo(c,1),intervalo(c,2));
+            end
+            a0=simple(sum(integral2)/(2*long));
+            an=simple(sum(integral3)/long);
+            dn=an*cos(n*pi*var_1/(2*long));
+            resul_1=a0+symsum(dn,n,1,inf);
+            code=2;disp(resul_1)
+         case 3 %p=2L=2*long <=> L=p/2 
+            disp('Serie de Fourier:')
+            for c=1:cantidad
+                integral4(c)=int(fun(c),var_1,intervalo(c,1),intervalo(c,2));
+                integral5(c)=int(fun(c).*cos((n*pi*var_1)/long),var_1,intervalo(c,1),intervalo(c,2));
+                integral6(c)=int(fun(c).*sin((n*pi*var_1)/long),var_1,intervalo(c,1),intervalo(c,2));
+            end
+            a0=simple(sum(integral4)/(2*long));
+            an=simple(sum(integral5)/long);
+            bn=simple(sum(integral6)/long);
+            dn=an*cos(n*pi*var_1/long)+bn*sin(n*pi*var_1/long);
+            resul_1=a0+symsum(dn,n,1,inf);
+            code=3;disp(resul_1)  
+         otherwise
+            error('Opción desconocida.');
+         end %end del switch sw  
+       else %serie de Fourier ordinario
+         disp('Serie de Fourier:')
+         for c=1:cantidad
+             integral4(c)=int(fun(c),var_1,intervalo(c,1),intervalo(c,2));
+             integral5(c)=int(fun(c).*cos((n*pi*var_1)/long),var_1,intervalo(c,1),intervalo(c,2));
+             integral6(c)=int(fun(c).*sin((n*pi*var_1)/long),var_1,intervalo(c,1),intervalo(c,2));
+         end
+         a0=simple(sum(integral4)/(2*long));
+         an=simple(sum(integral5)/long);
+         bn=simple(sum(integral6)/long);
+         dn=an*cos(n*pi*var_1/long)+bn*sin(n*pi*var_1/long);
+         resul_1=a0+symsum(dn,n,1,inf);
+         code=3;disp(resul_1)
+      end %fin del if intervalo(1,1)==0
+      if code==3 %SERIE COMPLEJA [no para desarrollo de medio rango]
+         disp('Serie de Fourier Compleja:')
+         for c=1:cantidad
+             integral(c)=int(fun(c).*exp((-i*n*pi*var_1)/long),var_1,intervalo(c,1),intervalo(c,2));
+         end
+         ct_1=simple(sum(integral)/(2*long));
+         cresul=symsum(ct_1*exp(i*n*pi*var_1/long),n,-inf,inf);
+         disp(cresul)
+      end   
+      % ************ GRÁFICAS DE LA SERIE DE FOURIER **********   
+      while hi==100 
+         grafica=input('¿Permitir gráficas de la serie?(S/N): ','s');
+         if grafica=='S' 
+            k1=input('¿Hasta qué valor de n se desea graficar?: ');
+            if fnd_1 == 1 %si está k en la serie
+                k2=input('Digite valor a k: ');
+            end    
+            if fnd_2==1 %si está w en la serie
+                k3=input('Digite valor a w: ');
+            end
+            chart_0=double(subs(intervalo,{k,w},{k2,k3}));
+            chart_1=input('Nº de pasos en el intervalo: ');
+            chart=(chart_0(1,1):chart_1:chart_0(cantidad,2));%valores de x o t
+            vector=zeros(k1,max(size(chart)));%matriz de ceros de k1 filas 
+            disp('Espere...')                 %y Nº de columnas de "chart"
+%%%%%%%   ALGORITMO PARA RESOLVER PROBLEMA DE INDETERMINACIONES   %%%%%%%%
+%           -------  existe indeterminaciones en dn?  -------    
+            d=1;N_1=0;N_6=0;
+            [N,D]=numden(dn);
+            for c=1:50%limitado hasta n=50
+                N_0(c)=double(subs(dn,{n,k,w,var_1},{c,k2,k3,0}));
+                if isnan(N_0(c))==1 || isinf(N_0(c))==1%existe indeterminacion? 
+                   N_1(d)=c;%guardando valores n donde existan esos casos
+                   d=d+1;
+                end
+            end
+        %%%%%%%%%%% ALGORITMO DE REGLA DE L'HOPITAL %%%%%%%%%%%%%%  
+            if any(N_1)==1 %elementos del vector~=0 (hay raices?)
+               d=0;e=1;d1=1;
+               limit_0=N;limit_1=D;
+               for c=1:max(size(N_1))
+                 if d==1
+                    d=0;%reiniciar la derivación
+                 end   
+                 while d==0%----- derivando num y den (hallar limite)-----
+                   limit_0=diff(limit_0,n);%derivada num
+                   limit_1=diff(limit_1,n);%derivada den
+                   limit1=subs(limit_0,{n},{N_1(c)});%evaluar num
+                   limit2=subs(limit_1,{n},{N_1(c)});%evaluar den
+                   N_4(d1)=limit1/limit2;%limite calculado!!!
+                   N_5(e)=N_1(c);%valores de n aplicados al limite
+                   N1_4=double(subs(N_4(d1),{k,w,var_1},{k2,k3,0}));
+                   if isnan(N1_4)==1 || isinf(N1_4)==1
+                       d=0;%continuar derivando
+                   else
+                       d=1;%seguir el proceso con otro valor de n o
+                   end     %el proceso ya terminó
+                 end
+                 d1=d1+1;e=e+1;
+               end
+               N_6=max(size(N_4));%cuantas funciones salen del limite?
+            end
+%%% LO ANTERIOR HALLA LIMITES PARA CUALQUIER Nº DE RAICES PERO NO
+%%% NO DISTINGUE LAS INDETERMINACIONES 0/0 (NaN) de las "inf"
+%%% LIMITACIÓN: LO SIGUIENTE SOLO SE APLICA A CASOS DE UNA SOLA RAIZ
+           switch lower(code) %para saber qué tipo de serie 
+               case 1 %SERIE DE SENOS 
+                   if N_6==1%una sola raíz? 
+                      if N_5(1)==1 %si n=1
+                         for v=1:k1
+                             beta=N_4(1)+symsum(dn,n,2,v);
+                             alfa_1=subs(beta,{k,w},{k2,k3});%reemplazando a k por k2 y w por k3
+                             alfa=subs(alfa_1,chart);%valores de las sumas parciales
+                             vector(v,:)=alfa;%guardando valores de las sumas parciales 
+                         end                  %por filas hasta que llegue a la fila k1  
+                     else % n>1
+                         for v=1:k1
+                             if (N_5(1)-1)<v
+                                 beta=symsum(dn,n,1,N_5(1)-1)+N_4(1)+symsum(dn,n,N_5(1)+1,v);
+                             else
+                                 beta=symsum(dn,n,1,v);
+                             end
+                             alfa_1=subs(beta,{k,w},{k2,k3});
+                             alfa=subs(alfa_1,chart);
+                             vector(v,:)=alfa;
+                         end                  
+                      end %end del if N_5(1)==1
+                   end %end del if N_6==1
+             case 2 %SERIE DE COSENOS
+                   if N_6==1 
+                      if N_5(1)==1 %n=1
+                         for v=1:k1 
+                             beta=a0+N_4(1)+symsum(dn,n,2,v);
+                             alfa_1=subs(beta,{k,w},{k2,k3});
+                             alfa=subs(alfa_1,chart);
+                             vector(v,:)=alfa;
+                         end
+                      else % n>1
+                         for v=1:k1
+                             if (N_5(1)-1)<v
+                                 beta=a0+symsum(dn,n,1,N_5(1)-1)+N_4(1)+symsum(dn,n,N_5(1)+1,v);
+                             else
+                                 beta=a0+symsum(dn,n,1,v);
+                             end
+                             alfa_1=subs(beta,{k,w},{k2,k3});
+                             alfa=subs(alfa_1,chart);
+                             vector(v,:)=alfa;
+                         end
+                      end %if N_5(1)==1
+                  end %if N_6==1
+             case 3  %SERIE DE FOURIER 0<x<L y -L<x<L
+                 if N_6==1 
+                    if N_5(1)==1%n=1 
+                       for v=1:k1 
+                           beta=a0+N_4(1)+symsum(dn,n,2,v);
+                           alfa_1=subs(beta,{k,w},{k2,k3});
+                           alfa=subs(alfa_1,chart);
+                           vector(v,:)=alfa;
+                       end
+                    else %n>1
+                       for v=1:k1
+                           if (N_5(1)-1)<v 
+                               beta=a0+symsum(dn,n,1,N_5(1)-1)+N_4(1)+symsum(dn,n,N_5(1)+1,v);
+                           else
+                               beta=a0+symsum(dn,n,1,v);                              
+                           end
+                           alfa_1=subs(beta,{k,w},{k2,k3});
+                           alfa=subs(alfa_1,chart);
+                           vector(v,:)=alfa;
+                       end
+                    end
+                 end
+            end %end del switch lower(code)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
+            switch lower(code)%FORMA ORDINARIA
+             case 1  %****** Serie de senos ******
+               if N_6==0 || N_6>1
+                 for v=1:k1 %obteniendo sumas parciales 
+                  beta=symsum(bn*sin((n*pi*var_1)/(2*long)),n,1,v); 
+                  alfa_1=subs(beta,{k,w},{k2,k3});%reemplazando a k por k2 y w por k3
+                  alfa=subs(alfa_1,chart);%valores de las sumas parciales
+                  vector(v,:)=alfa;%guardando valores de las sumas parciales
+                                   %por filas hasta que llegue a la fila k1
+                 end 
+               end 
+             case 2 %****** Serie de cosenos ******
+               if N_6==0 || N_6>1
+                 for v=1:k1 
+                   beta=a0+symsum(an*cos((n*pi*var_1)/(2*long)),n,1,v);
+                   alfa_1=subs(beta,{k,w},{k2,k3});
+                   alfa=subs(alfa_1,chart);
+                   vector(v,:)=alfa;
+                 end
+               end
+             case 3 %******* serie de Fourier para 0<x<L y -L<x<L*******
+                if (N_6==0 && N_6>1) || (N_6>1 && N_6==0)||(N_6>1 && N_6>1)||(N_6==0 && N_6==0)
+                 for v=1:k1 
+                     beta=a0+symsum(an*cos((n*pi*var_1)/long)+bn*sin((n*pi*var_1)/long),n,1,v);
+                     alfa_1=subs(beta,{k,w},{k2,k3});
+                     alfa=subs(alfa_1,chart);
+                     vector(v,:)=alfa;
+                 end
+                end
+            end %End del switch
+            strobe=input('Valores de n: ');
+            h2=plot(chart,vector(strobe,:));
+            grid on;set(h2,'linewidth',2)
+            if var_1==x
+               xlabel('Eje x');ylabel('Eje f(x)')
+            elseif var_1==t
+               xlabel('Eje t');ylabel('Eje f(t)')
+            end  
+            hi =101; %constante para salir del while hi==100
+         elseif grafica=='N'%else del if grafica=='S'
+                hi=101;
+         end 
+      end % End del while hi==100 
+      while out==100 
+            t_1=input('¿Desea continuar?(S/N): ','s');
+            if t_1=='S'
+               t_1='^';
+               out=101;
+            elseif t_1=='N'
+               out=101;
+            end
+      end
+end %end del while t=='^' (FIN DEL PROGRAMA)
+clc %borrando pantalla
+%Programa fourierseries. versión 1.1
+%Made by: Jesús castro. Date: june 2006
+%Improved: 19-07-08

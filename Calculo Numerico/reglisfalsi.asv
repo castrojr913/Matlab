@@ -1,0 +1,38 @@
+%METODO REGLIS FALSI (REGLA FALSA)
+%By: Jesús A. Castro R. Date: 26-10-08  
+%basado en: Numerical_Methods_using_MATLAB__3rd_Ed. John Mattews.
+% La raíz se obtiene al hallar la intersección de la recta que pasa por 
+% los puntos (a,f(ak)) y (b,f(bk)) con el eje de abscisas (igual al
+% método de la secante). Esta se halla con la expresion:
+% ck=(ak*f(bk)-bk*f(ak))/(f(bk)-f(ak))
+clear
+disp('<< Metodo Reglis Falsi >>')
+y=sym(input('Función: ','s'));
+ab=input('Intervalo [a,b]: ');
+iter=input('Iteraciones: ');
+tol=input('Tolerancia: ');
+a=ab(1);b=ab(2);
+fa=subs(y,a);fb=subs(y,b);
+if fa*fb>0 %teorema de bolzano
+   error('a y b deben tener de signos opuestos')
+else
+    disp(' Iter        a              b                c            f(c)         |b-a|/2')
+    for k=1:iter
+     
+        c=b-dx;%reglis falsi
+        fc=subs(y,c);
+     e=abs(b-a)/2; 
+     fprintf('%3i   %13.9f   %13.9f   %13.9f   %13.9f   %13.9f\n',k,a,b,c,fc,e)
+     if e>tol && fc>tol 
+        if fa*fc>0,a=c;fa=fc;
+        else b=c;fb=fc;
+        end
+     else
+         fprintf('Solución con %i iteraciones: %13.9f\n',k,c)
+         break
+     end
+    end
+end
+if e>tol && fc>tol
+   error('Insuficiente número de iteraciones')
+end

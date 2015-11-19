@@ -1,0 +1,25 @@
+%metodo aprox. sucesivas y sustitución: no es aplicado a toda f(x)
+%por limitación en convergencia. Solo a aquellas tal que 0<f'(x)<1
+clear
+syms x
+disp('<< Metodo Aproximaciones Sucesivas o Punto Fijo>>')
+y=input('Función x=g(x): ');
+x0=input('Aprox. inicial: ');
+iter=input('Iteraciones: ');
+tol=input('Tolerancia: ');%no en porcentaje
+disp(' Iter             x0              xn               |xn-x0|')  
+for k=2:iter
+    xn=subs(y,x0);
+    e=abs(xn-x0);
+    fprintf('  %3i     %13.9f      %13.9f        %11.9f\n',k,x0,xn,e)  
+      if e>tol,x0=xn;
+        else cnt=0; break
+        end
+    end   
+end
+if cnt~=0
+   error('Insuficiente número de iteraciones')
+else
+   fprintf('Solución con %i iteraciones: %13.9f\n',k,xn)
+end
+%By: Jesus Alberto Castro Rojas Date: 25-10-08 

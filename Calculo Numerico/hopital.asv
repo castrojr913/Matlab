@@ -1,0 +1,20 @@
+function N_1=hopital(FUN,N)
+%HOPITAL calcula el límite de una función re
+syms x
+d=0;N=sym(N);
+[NUM,DEN]=numden(FUN);
+limit_0=NUM;limit_1=DEN;
+while d==0%----- derivando num y den (hallar limite)-----
+      limit_0=diff(limit_0,x);%derivada num
+      limit_1=diff(limit_1,x);%derivada den
+      limit1=subs(limit_0,{x},{N});%evaluar num
+      limit2=subs(limit_1,{x},{N});%evaluar den
+      N_1=limit1/limit2;%limite calculado!!!
+      if isnan(double(N_1))==1 
+             d=0;%continuar derivando
+      else
+          d=1;%terminar el proceso de derivación
+      end     
+end
+ 
+%Creado por: Ing. Jesús Castro. Julio 2008. 
